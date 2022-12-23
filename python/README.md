@@ -4,12 +4,6 @@ This is an official package for the Paycek payment processor. The documentation 
 
 For in depth information about endpoints, fields and more, read our [API Documentation](https://paycek.io/api/docs).
 
-## Links
-
-[Website](https://paycek.io)
-
-[Source Code](https://github.com)
-
 ## Quick Start
 
 ### Installation
