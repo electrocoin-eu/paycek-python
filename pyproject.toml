@@ -1,6 +1,6 @@
 [project]
 name = "paycek"
-version = "0.0.9"
+version = "0.0.10"
 authors = [
     { name = "Electrocoin d.o.o." }
 ]
@@ -15,5 +15,5 @@ classifiers = [
 
 [project.urls]
 "Website" = "https://paycek.io"
-"Source Code" = "https://github.com/electrocoin-eu/paycek-python/tree/main/python"
+"Source Code" = "https://github.com/electrocoin-eu/paycek-python"
 "Bug Tracker" = "https://github.com/electrocoin-eu/paycek-python/issues"
