@@ -62,8 +62,22 @@ class Paycek:
 
 		return r.json()
 
-	def check_headers(self, headers, endpoint, body_bytes, key: str, secret: str, http_method='GET', content_type=''):
-		generated_mac = self._generate_mac_hash(headers['Apikeyauth-Nonce'], endpoint, body_bytes, key, secret, http_method, content_type)
+	def check_headers(self, headers, endpoint, body_bytes, code: str, secret: str, http_method='GET', content_type=''):
+		"""
+		This method is used to verify callback was encoded by paycek.
+		A mac digest will be created by encoding nonce from headers, endpoint, body bytes, your profile code and secret, http method and content type.
+		That value will be compared with mac digest from headers.
+
+		:param headers: callback headers
+		:param endpoint: callback endpoint
+		:param body_bytes: callback body bytes
+		:param code: profile code
+		:param secret: profile secret
+		:param http_method: callback http method
+		:param content_type: callback content type
+		:return: True if the generated mac digest is equal to the one received in headers, False otherwise
+		"""
+		generated_mac = self._generate_mac_hash(headers['Apikeyauth-Nonce'], endpoint, body_bytes, code, secret, http_method, content_type)
 
 		return hmac.compare_digest(headers['Apikeyauth-Mac'], generated_mac)
 
