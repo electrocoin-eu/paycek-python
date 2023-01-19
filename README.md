@@ -21,10 +21,7 @@ Under account settings you’ll find your API key and secret. Initialize a payce
 ```python
 from paycek import Paycek
 
-paycek = Paycek(
-    api_key='<api_key>',
-    api_secret='<api_secret>'
-)
+paycek = Paycek('<api_key>', '<api_secret>')
 ```
 
 ### Usage

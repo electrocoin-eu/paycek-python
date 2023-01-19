@@ -39,16 +39,11 @@ class Paycek:
 		return mac.hexdigest()
 
 	def _api_call(self, endpoint: str, body: dict):
-		endpoint = f'{self.api_prefix}/{endpoint}'
+		prefixed_endpoint = f'{self.api_prefix}/{endpoint}'
 		body_bytes = json.dumps(body).encode(self.encoding)
-
 		nonce_str = str(int(time.time() * 1000))
 
-		mac_hash = self._generate_mac_hash(
-			nonce_str=nonce_str,
-			endpoint=endpoint,
-			body_bytes=body_bytes
-		)
+		mac_hash = self._generate_mac_hash(nonce_str, prefixed_endpoint, body_bytes)
 
 		headers = {
 			'Content-Type': 'application/json',
@@ -59,11 +54,10 @@ class Paycek:
 
 		r = requests.request(
 			method='POST',
-			url=f'{self.api_host}{endpoint}',
+			url=f'{self.api_host}{prefixed_endpoint}',
 			data=body_bytes,
 			headers=headers
 		)
-
 		r.encoding = self.encoding
 
 		return r.json()
@@ -154,7 +148,7 @@ class Paycek:
 	def open_payment(self, profile_code: str, dst_amount: str, **optional_fields):
 		"""
 		:param optional_fields: Optional fields:
-			payment_id: “string
+			payment_id: string
 			location_id: string
 			items: array
 			email: string
