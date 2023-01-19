@@ -15,15 +15,13 @@ class Paycek:
 		self.api_prefix = '/processing/api'
 		self.encoding = 'utf-8'
 
-	def _generate_mac_hash(self, nonce_str: str, endpoint: str, body_bytes: bytes, key=None, secret=None, http_method='POST', content_type='application/json'):
-		key = self.api_key if key is None else key
-		secret = self.api_secret if secret is None else secret
+	def _generate_mac_hash(self, nonce_str: str, endpoint: str, body_bytes: bytes, http_method='POST', content_type='application/json'):
 
 		mac = hashlib.sha3_512()
 		mac.update(b'\0')
-		mac.update(key.encode(self.encoding))
+		mac.update(self.api_key.encode(self.encoding))
 		mac.update(b'\0')
-		mac.update(secret.encode(self.encoding))
+		mac.update(self.api_secret.encode(self.encoding))
 		mac.update(b'\0')
 		mac.update(nonce_str.encode(self.encoding))
 		mac.update(b'\0')
@@ -62,95 +60,48 @@ class Paycek:
 
 		return r.json()
 
-	def check_headers(self, headers, endpoint, body_bytes, code: str, secret: str, http_method='GET', content_type=''):
+	def check_headers(self, headers: dict, endpoint: str, body_bytes: bytes, http_method='GET', content_type=''):
 		"""
 		This method is used to verify callback was encoded by paycek.
-		A mac digest will be created by encoding nonce from headers, endpoint, body bytes, your profile code and secret, http method and content type.
+		A mac digest will be created by encoding nonce from headers, endpoint, body bytes, your api key and secret, http method and content type.
 		That value will be compared with mac digest from headers.
 
 		:param headers: callback headers
 		:param endpoint: callback endpoint
 		:param body_bytes: callback body bytes
-		:param code: profile code
-		:param secret: profile secret
 		:param http_method: callback http method
 		:param content_type: callback content type
 		:return: True if the generated mac digest is equal to the one received in headers, False otherwise
 		"""
-		generated_mac = self._generate_mac_hash(headers['Apikeyauth-Nonce'], endpoint, body_bytes, code, secret, http_method, content_type)
+		generated_mac = self._generate_mac_hash(headers['Apikeyauth-Nonce'], endpoint, body_bytes, http_method, content_type)
 
 		return hmac.compare_digest(headers['Apikeyauth-Mac'], generated_mac)
 
-	def generate_payment_url(self, profile_id, secret_key, payment_id, total_amount, items=None, email='', success_url='', fail_url='', back_url='', success_url_callback='', fail_url_callback='', status_url_callback='', description='', language=''):
+	def generate_payment_url(self, profile_code: str, dst_amount: str, **optional_fields):
 		"""
-		:param profile_id: string, unique profile id (id that you are using on your website to uniquely describe payment profile)
-		:param secret_key: string, profile secret key
-		:param payment_id: string, unique payment id (id that you are using on your website to uniquely describe the purchase)
-		:param total_amount: string, total price (example "100.00")
-		:param items: array of dicts (this is used to display purchased items list to customer)
-				example: [{'name': 'smartphone', 'units': '1', 'amount': '999.00'}, {'name': 'cable', 'units': '1', 'amount': '29.00'}]
-		:param email: string, email of your customer
-		:param success_url: string, URL of a web page to go to after a successful payment
-		:param fail_url: string, URL of a web page to go to after a failed payment
-		:param back_url: string, URL for client to go to if he wants to get back to your tool
-		:param success_url_callback: string, URL of an API that paycek.io will call after successful payment
-		:param fail_url_callback: string, URL of an API that paycek.io will call after failed payment
-		:param status_url_callback: string, URL of an API that paycek.io will call after each payment status change (advanced)
-				This callback will be called with an optional argument ?status=<status>&id=<payment_id>
-					<status> options are listed bellow:
-						created - payment has been created
-						waiting_transaction - waiting for the amount to appear on blockchain
-						waiting_confirmations - waiting for the right amount of confirmations
-						underpaid - an insufficient amount detected on blockchain
-						successful - right amount detected and confirmed on blockchain
-						expired - time for this payment has run out
-						canceled - the payment has been manually canceled by paycek operations
-					<payment_id> is the payment_id you provided when you generated the URL
-		:param description: string, payment description (max length 100 characters)
-		:param language: string, language in which the payment will be shown to the customer ('en', 'hr')
-		:return: string, URL for starting a payment process on https://paycek.io
+		:param optional_fields: Optional fields:
+			payment_id: string
+			location_id: string
+			items: array
+			email: string
+			success_url: string
+			fail_url: string
+			back_url: string
+			success_url_callback: string
+			fail_url_callback: string
+			status_url_callback: string
+			description: string
+			language: string
+			generate_pdf: bool
+			client_fields: dict
 		"""
-		if items is None:
-			items = []
+		payment = self.open_payment(profile_code, dst_amount, **optional_fields)
 
-		formatted_items = []
-		for item in items:
-			new_item = {
-				'n': item['name'],
-				'u': item['units'],
-				'a': item['amount'],
-			}
-			formatted_items.append(new_item)
-
-		data = {
-			'p': total_amount,
-			'id': payment_id,
-			'e': email,
-			's': success_url,
-			'f': fail_url,
-			'b': back_url,
-			'sc': success_url_callback,
-			'fc': fail_url_callback,
-			'stc': status_url_callback,
-			'd': description,
-			'i': formatted_items,
-			'l': language,
-		}
-
-		data_json = json.dumps(data, separators=(',', ':'))
-		data_b64 = urlsafe_b64encode(data_json.encode('utf-8')).rstrip(b'=')
-
-		sha256 = hashlib.sha256()
-		sha256.update(data_b64)
-		sha256.update(b'\x00')
-		sha256.update(profile_id.encode(self.encoding))
-		sha256.update(b'\x00')
-		sha256.update(secret_key.encode(self.encoding))
-		data_hash = urlsafe_b64encode(sha256.digest()).rstrip(b'=').decode(self.encoding)
-
-		payment_url = f'{self.api_host}/processing/checkout/payment_create?d={data_b64.decode(self.encoding)}&c={profile_id}&h={data_hash}'
-
-		return payment_url
+		try:
+			return payment['data']['payment_url']
+		except KeyError:
+			print(payment)
+			raise
 
 	def get_payment(self, payment_code: str):
 		body = {
