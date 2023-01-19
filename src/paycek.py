@@ -210,12 +210,12 @@ class Paycek:
 	def profile_withdraw(self, profile_code: str, method: str, amount: str, details: dict, **optional_fields):
 		"""
 		:param details: Withdraw details object with fields:
-			iban: str (required)
-			purpose: str
-			model: str
-			pnb: str
+			iban: string (required)
+			purpose: string
+			model: string
+			pnb: string
 		:param optional_fields: Optional fields:
-			id: str
+			id: string
 		"""
 		body = {
 			"profile_code": profile_code,
@@ -230,17 +230,17 @@ class Paycek:
 	def create_account(self, email: str, name: str, street: str, city: str, country: str, profile_currency: str, profile_automatic_withdraw_method: str, profile_automatic_withdraw_details: dict, **optional_fields):
 		"""
 		:param profile_automatic_withdraw_details: Automatic withdraw details object with fields:
-			iban: str (required)
-			purpose: str
-			model: str
-			pnb: str
+			iban: string (required)
+			purpose: string
+			model: string
+			pnb: string
 		:param optional_fields: Optional fields:
-			type: str
-			oib: str
-			vat: str
-			profile_name: str
-			profile_email: str
-			profile_type: str
+			type: string
+			oib: string
+			vat: string
+			profile_name: string
+			profile_email: string
+			profile_type: string
 		"""
 		body = {
 			"email": email,
@@ -259,16 +259,16 @@ class Paycek:
 	def create_account_with_password(self, email: str, password: str, name: str, street: str, city: str, country: str, profile_currency: str, profile_automatic_withdraw_method: str, profile_automatic_withdraw_details: dict, **optional_fields):
 		"""
 		:param profile_automatic_withdraw_details: Automatic withdraw details object with fields:
-			iban: str (required)
-			purpose: str
-			model: str
-			pnb: str
+			iban: string (required)
+			purpose: string
+			model: string
+			pnb: string
 		:param optional_fields: Optional fields:
-			type: str
-			oib: str
-			vat: str
-			profile_name: str
-			profile_email: str
+			type: string
+			oib: string
+			vat: string
+			profile_name: string
+			profile_email: string
 		"""
 		body = {
 			"email": email,
@@ -288,12 +288,12 @@ class Paycek:
 	def get_reports(self, profile_code: str, datetime_from: str, datetime_to: str, **optional_fields):
 		"""
 		:param profile_automatic_withdraw_details: Automatic withdraw details object with fields:
-			iban: str (required)
-			purpose: str
-			model: str
-			pnb: str
+			iban: string (required)
+			purpose: string
+			model: string
+			pnb: string
 		:param optional_fields: Optional fields:
-			location_id: str
+			location_id: string
 		"""
 		body = {
 			"profile_code": profile_code,
