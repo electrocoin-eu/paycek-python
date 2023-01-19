@@ -1,6 +1,6 @@
 # Paycek
 
-This is an official package for the Paycek payment processor. The documentation provided in code explains only minor implementation details.
+This is an official package for the [Paycek crypto payment processor](https://paycek.io). The documentation provided in code explains only minor implementation details.
 
 For in depth information about endpoints, fields and more, read our [API Documentation](https://paycek.io/api/docs).
 
@@ -26,6 +26,12 @@ paycek = Paycek('<api_key>', '<api_secret>')
 
 ### Usage
 
+#### Get payment
 ```python
 payment = paycek.get_payment('<payment_code>')
+```
+
+#### Open payment
+```python
+payment = paycek.open_payment('<profile_code>', '<dst_amount>', '<location_id>')
 ```
