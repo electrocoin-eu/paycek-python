@@ -2,7 +2,6 @@ import hashlib
 import hmac
 import json
 import time
-from base64 import urlsafe_b64encode
 
 import requests
 
@@ -73,9 +72,10 @@ class Paycek:
 		:param content_type: callback content type
 		:return: True if the generated mac digest is equal to the one received in headers, False otherwise
 		"""
-		generated_mac = self._generate_mac_hash(headers['Apikeyauth-Nonce'], endpoint, body_bytes, http_method, content_type)
+		headers_lower = {key.lower(): headers[key] for key in headers}
+		generated_mac = self._generate_mac_hash(headers_lower['apikeyauth-nonce'], endpoint, body_bytes, http_method, content_type)
 
-		return hmac.compare_digest(headers['Apikeyauth-Mac'], generated_mac)
+		return hmac.compare_digest(headers_lower['apikeyauth-mac'], generated_mac)
 
 	def generate_payment_url(self, profile_code: str, dst_amount: str, **optional_fields):
 		"""
@@ -238,11 +238,6 @@ class Paycek:
 
 	def get_reports(self, profile_code: str, datetime_from: str, datetime_to: str, **optional_fields):
 		"""
-		:param profile_automatic_withdraw_details: Automatic withdraw details object with fields:
-			iban: string (required)
-			purpose: string
-			model: string
-			pnb: string
 		:param optional_fields: Optional fields:
 			location_id: string
 		"""
