@@ -1,0 +1,28 @@
+[project]
+name = "paycek"
+version = "1.1.0"
+authors = [
+    { name = "Electrocoin d.o.o." }
+]
+description = "A connector library for communicating with PayCek public API"
+readme = "README.md"
+requires-python = ">=3.6"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+keywords = [
+    'paycek',
+    'cryptocurrency',
+    'bitcoin',
+    'ether',
+    'payment',
+    'cryptopayment',
+    'exchange'
+]
+
+[project.urls]
+"Website" = "https://paycek.io"
+"Source Code" = "https://github.com/electrocoin-eu/paycek-python"
+"Bug Tracker" = "https://github.com/electrocoin-eu/paycek-python/issues"
