@@ -71,10 +71,13 @@ class Paycek:
 		:param content_type: callback content type
 		:return: True if the generated mac digest is equal to the one received in headers, False otherwise
 		"""
-		headers_lower = {key.lower(): headers[key] for key in headers}
-		generated_mac = self._generate_mac_hash(headers_lower['apikeyauth-nonce'], endpoint, body_bytes, http_method, content_type)
+		try:
+			headers_lower = {key.lower(): headers[key] for key in headers}
+			generated_mac = self._generate_mac_hash(headers_lower['apikeyauth-nonce'], endpoint, body_bytes, http_method, content_type)
 
-		return hmac.compare_digest(generated_mac, headers_lower['apikeyauth-mac'])
+			return hmac.compare_digest(generated_mac, headers_lower['apikeyauth-mac'])
+		except:
+			return False
 
 	def generate_payment_url(self, profile_code: str, dst_amount: str, **optional_fields):
 		"""
