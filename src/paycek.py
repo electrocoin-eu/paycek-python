@@ -114,21 +114,46 @@ class Paycek:
 
 	def open_payment(self, profile_code: str, dst_amount: str, **optional_fields):
 		"""
+		You can implement getting payment status in 3 ways:
+
+		1. **Provide** ``status_url_callback`` upon opening a payment and receive status updates on your endpoint.
+		2. **Provide** ``success_url_callback`` **and** ``fail_url_callback`` upon opening a payment and receive success and fail updates on your endpoints.
+		3. **Manually poll** ``payment/get`` to check payment status.
+
+		**Do not use** ``fail_url`` **and** ``success_url`` **to update payment status in your system. These URLs are used ONLY for redirecting users back to your shop.**
+
+		**Authorization**
+
+		If you decide to use callbacks, you **must check the headers for every callback** to ensure they are authorized.
+		If a callback doesn't have a valid Authorization header, your server must respond with a **401 Unauthorized** status. If the callback has a valid Authorization header, your server must respond with a **200 OK** status.
+
+		**Integration Testing**
+
+		In order to ensure system security, on every new payment, an automated integration test will check if your integration is secure.
+		An API call with an invalid Authorization header will be made to each of your callback endpoints. If any endpoint returns a status other than 401 for requests with an invalid Authorization header, **all ongoing payments will be canceled**, and your **profile will be blocked** to prevent unauthorized transactions. Ensure your endpoints are correctly configured to handle authorization and respond appropriately.
+
+		*Test profiles won't be blocked even if the response for callbacks with an invalid Authorization header returns an invalid status. The payment will still be canceled.*
+
+		:param profile_code: The profile code for the payment.
+		:type profile_code: str
+		:param dst_amount: The amount of the payment.
+		:type dst_amount: float
 		:param optional_fields: Optional fields:
-			payment_id: string
-			location_id: string
-			items: array
-			email: string
-			success_url: string
-			fail_url: string
-			back_url: string
-			success_url_callback: string
-			fail_url_callback: string
-			status_url_callback: string
-			description: string
-			language: string
-			generate_pdf: bool
-			client_fields: dict
+				- payment_id (str)
+				- location_id (str)
+				- items (list)
+				- email (str)
+				- success_url (str)
+				- fail_url (str)
+				- back_url (str)
+				- success_url_callback (str)
+				- fail_url_callback (str)
+				- status_url_callback (str)
+				- description (str)
+				- language (str)
+				- generate_pdf (bool)
+				- client_fields (dict)
+		:type optional_fields: dict
 		"""
 		body = {
 			"profile_code": profile_code,
